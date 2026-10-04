@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<body style="background-image: url('./Blackhole.gif'); background-size: cover; background-position: center; background-repeat: no-repeat; margin: 0; height: 100vh; overflow: hidden;">
+
+  <!-- TOP BAR -->
+  <div style="position: absolute; width: 100%; display: flex; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); background: rgba(255, 255, 255, 0.05); border-bottom: 1px solid rgba(255, 255, 255, 0.3); box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.1), 0 4px 10px rgba(0, 0, 0, 0.1); color: #fff; justify-content: space-between; font-family: sans-serif; align-items: center; z-index: 1000;">
+    <p style="margin-left: 16px; font-weight: bold;">AstroSparkOS</p>
+    <p style="margin-left: 16px; background-color: rgba(255, 255, 255, 0.25); padding: 4px 12px; border-radius: 16px; font-family: sans-serif;">A Spark in Space</p>
+    <!-- FIX: Added closed tag and corrected invalid rgba(256) to rgba(255) -->
+    <p id="timeElement" style="margin-right: 16px; background-color: rgba(255, 255, 255, 0.125); padding: 4px 12px; border-radius: 16px; font-family: sans-serif;"></p>
+  </div>
+
+  <!-- DRAGGABLE GLASS WINDOW -->
+  <!-- FIX: ID must match what JS looks for ("welcome"), absolute placement initialized -->
+  <div id="welcome" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border: 1px solid rgba(255, 255, 255, 0.4); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.3), 0 4px 20px rgba(0, 0, 0, 0.3); background: rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 12px; color: white; font-family: sans-serif; min-width: 300px; user-select: none;">
+    <!-- WINDOW HEADER / DRAG HANDLE -->
+    <p id="welcomeheader" style="margin: -20px -20px 15px -20px; padding: 10px; background: rgba(255, 255, 255, 0.2); border-top-left-radius: 11px; border-top-right-radius: 11px; cursor: move; font-weight: bold; text-align: center;"> 
+      Drag Me
+    </p>
+    <h1>Welcome to AstroSpark WebOS!</h1>
+    <h2>Introduction</h2>
+    <p>Hello World</p>
+    <img src="./BlackHole.jpeg" style="max-width: 100%; height: auto; border-radius: 6px;" />
+  </div>
+
+  <script>
+    function updateTime() {
+        var currentTime = new Date().toLocaleString();
+        var timeText = document.querySelector("#timeElement");
+        if(timeText) timeText.innerHTML = currentTime;
+    }
+    setInterval(updateTime, 1000);
+    updateTime(); // Run instantly on load
+  </script>
+  <script src="script.js"></script>
+ </body>
+</html>
