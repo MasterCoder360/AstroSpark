@@ -1,37 +1,76 @@
 <!DOCTYPE html>
-<html>
-<body style="background-image: url('./Blackhole.gif'); background-size: cover; background-position: center; background-repeat: no-repeat; margin: 0; height: 100vh; overflow: hidden;">
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AstroSpark WebOS</title>
+  <!-- FIXED: Links directly to your root style.css file (Option 1) -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-  <!-- TOP BAR -->
-  <div style="position: absolute; width: 100%; display: flex; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); background: rgba(255, 255, 255, 0.05); border-bottom: 1px solid rgba(255, 255, 255, 0.3); box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.1), 0 4px 10px rgba(0, 0, 0, 0.1); color: #fff; justify-content: space-between; font-family: sans-serif; align-items: center; z-index: 1000;">
-    <p style="margin-left: 16px; font-weight: bold;">AstroSparkOS</p>
-    <p style="margin-left: 16px; background-color: rgba(255, 255, 255, 0.25); padding: 4px 12px; border-radius: 16px; font-family: sans-serif;">A Spark in Space</p>
-    <!-- FIX: Added closed tag and corrected invalid rgba(256) to rgba(255) -->
-    <p id="timeElement" style="margin-right: 16px; background-color: rgba(255, 255, 255, 0.125); padding: 4px 12px; border-radius: 16px; font-family: sans-serif;"></p>
+  <!-- TOP BAR NAVIGATION -->
+  <div class="top-bar">
+    <p id="osTrigger" class="top-bar-title" title="Click to open Welcome window">AstroSparkOS</p>
+    <p class="top-bar-badge">A Spark in Space</p>
+    <p id="timeElement" class="top-bar-time"></p>
   </div>
 
-  <!-- DRAGGABLE GLASS WINDOW -->
-  <!-- FIX: ID must match what JS looks for ("welcome"), absolute placement initialized -->
-  <div id="welcome" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border: 1px solid rgba(255, 255, 255, 0.4); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.3), 0 4px 20px rgba(0, 0, 0, 0.3); background: rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 12px; color: white; font-family: sans-serif; min-width: 300px; user-select: none;">
-    <!-- WINDOW HEADER / DRAG HANDLE -->
-    <p id="welcomeheader" style="margin: -20px -20px 15px -20px; padding: 10px; background: rgba(255, 255, 255, 0.2); border-top-left-radius: 11px; border-top-right-radius: 11px; cursor: move; font-weight: bold; text-align: center;"> 
-      Drag Me
-    </p>
+  <!-- DRAGGABLE GLASS WINDOW BOX -->
+  <div id="welcome" class="window-box">
+    
+    <!-- WINDOW HEADER AREA (DRAG HANDLE ROW) -->
+    <div id="welcomeheader" class="closebutton">
+      <!-- RED SQUARE CLOSE BUTTON WITH CENTERED X -->
+      <div id="welcomeclose" title="Close">✕</div>
+      
+      <!-- WINDOW TITLE TEXT -->
+      <p class="window-header-title">AstroSpark</p>
+      
+      <!-- INVISIBLE RIGHT BALANCE BLOCK -->
+      <div class="header-spacer"></div>
+    </div>
+    
+    <!-- WINDOW INTERIOR MAIN CONTENT -->
     <h1>Welcome to AstroSpark WebOS!</h1>
     <h2>Introduction</h2>
     <p>Hello World</p>
-    <img src="./BlackHole.jpeg" style="max-width: 100%; height: auto; border-radius: 6px;" />
+    <img src="./BlackHole.jpeg" alt="Black Hole" />
   </div>
 
+  <!-- RUNTIME DESKTOP OS INTERACTION CONTROLS -->
   <script>
+    // Live OS Clock Functionality
     function updateTime() {
         var currentTime = new Date().toLocaleString();
         var timeText = document.querySelector("#timeElement");
         if(timeText) timeText.innerHTML = currentTime;
     }
     setInterval(updateTime, 1000);
-    updateTime(); // Run instantly on load
+    updateTime(); 
+
+    // Window Visibility Core Elements
+    const welcomeWindow = document.getElementById("welcome");
+    const closeButton = document.getElementById("welcomeclose");
+    const osTrigger = document.getElementById("osTrigger");
+
+    // Action: Click Red Square X to close/hide window box
+    closeButton.addEventListener("click", function(e) {
+      e.stopPropagation(); // Safe protection barrier for drag tracking loops
+      welcomeWindow.style.display = "none";
+    });
+
+    // Action: Click AstroSparkOS text banner to pop window back open
+    osTrigger.addEventListener("click", function() {
+      // Flushes out position modifications and resets window coordinates dead center
+      welcomeWindow.style.top = "50%";
+      welcomeWindow.style.left = "50%";
+      welcomeWindow.style.transform = "translate(-50%, -50%)";
+      welcomeWindow.style.display = "block";
+    });
   </script>
+  
+  <!-- Triggers your cursor window physics engine tracker -->
   <script src="script.js"></script>
  </body>
 </html>
