@@ -37,6 +37,14 @@
     <p>Hello World</p>
     <img src="./BlackHole.jpeg" alt="Black Hole" />
   </div>
+    <!-- LIQUID TASKBAR DOCK -->
+  <div class="dock-container">
+    <!-- Welcome App Launcher -->
+    <div id="dockWelcome" class="dock-icon active-app" title="Welcome App">✨</div>
+    <!-- Future App Placeholder Slot -->
+    <div id="dockCustomApp" class="dock-icon" title="Awaiting Configuration...">🚀</div>
+  </div>
+
 
   <!-- RUNTIME DESKTOP OS INTERACTION CONTROLS -->
   <script>
@@ -68,6 +76,26 @@
       welcomeWindow.style.transform = "translate(-50%, -50%)";
       welcomeWindow.style.display = "block";
     });
+        // Target the dock shortcut element
+    const dockWelcome = document.getElementById("dockWelcome");
+
+    // Action: Click the dock app symbol to restore or highlight the main window box
+    dockWelcome.addEventListener("click", function() {
+      if (welcomeWindow.style.display === "none" || welcomeWindow.style.display === "") {
+        // Run your centering initialization matrix parameters 
+        welcomeWindow.style.top = "50%";
+        welcomeWindow.style.left = "50%";
+        welcomeWindow.style.transform = "translate(-50%, -50%)";
+        welcomeWindow.style.display = "block";
+      } else {
+        // Shakes it slightly if it's already open to bring it to focus
+        welcomeWindow.style.transform = "translate(-50%, -50%) scale(1.03)";
+        setTimeout(() => {
+          welcomeWindow.style.transform = "translate(-50%, -50%) scale(1)";
+        }, 150);
+      }
+    });
+
   </script>
   
   <!-- Triggers your cursor window physics engine tracker -->
