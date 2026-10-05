@@ -4,8 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AstroSpark WebOS</title>
-  <!-- FIXED: Links directly to your root style.css file (Option 1) -->
   <link rel="stylesheet" href="style.css">
+  <!-- Loads the core VS Code Monaco editor engine library directly -->
+  <script src="https://jsdelivr.net"></script>
 </head>
 <body>
 
@@ -16,39 +17,39 @@
     <p id="timeElement" class="top-bar-time"></p>
   </div>
 
-  <!-- DRAGGABLE GLASS WINDOW BOX -->
+  <!-- 1. WELCOME GLASS WINDOW BOX -->
   <div id="welcome" class="window-box">
-    
-    <!-- WINDOW HEADER AREA (DRAG HANDLE ROW) -->
     <div id="welcomeheader" class="closebutton">
-      <!-- RED SQUARE CLOSE BUTTON WITH CENTERED X -->
       <div id="welcomeclose" title="Close">✕</div>
-      
-      <!-- WINDOW TITLE TEXT -->
       <p class="window-header-title">AstroSpark</p>
-      
-      <!-- INVISIBLE RIGHT BALANCE BLOCK -->
       <div class="header-spacer"></div>
     </div>
-    
-    <!-- WINDOW INTERIOR MAIN CONTENT -->
     <h1>Welcome to AstroSpark WebOS!</h1>
     <h2>Introduction</h2>
     <p>Hello World</p>
     <img src="./BlackHole.jpeg" alt="Black Hole" />
   </div>
-    <!-- LIQUID TASKBAR DOCK -->
-  <div class="dock-container">
-    <!-- Welcome App Launcher -->
-    <div id="dockWelcome" class="dock-icon active-app" title="Welcome App">✨</div>
-    <!-- Future App Placeholder Slot -->
-    <div id="dockCustomApp" class="dock-icon" title="Awaiting Configuration...">🚀</div>
+
+  <!-- 2. NEW VSCODE APPLICATIONS WINDOW (Hidden by default) -->
+  <div id="vscodeWindow" class="window-box" style="display: none; width: 700px; height: 450px; padding: 10px;">
+    <div id="vscodeWindowheader" class="closebutton">
+      <div id="vscodeClose" title="Close">✕</div>
+      <p class="window-header-title">Visual Studio Code</p>
+      <div class="header-spacer"></div>
+    </div>
+    <!-- Monaco code canvas mount box -->
+    <div id="monacoContainer" style="width: 100%; height: calc(100% - 35px); border-radius: 6px; overflow: hidden; border: 1px solid rgba(255,255,255,0.2);"></div>
   </div>
 
+  <!-- LIQUID TASKBAR DOCK -->
+  <div class="dock-container">
+    <div id="dockWelcome" class="dock-icon active-app" title="Welcome App">✨</div>
+    <div id="dockVSCode" class="dock-icon" title="VS Code App">🚀</div>
+  </div>
 
-  <!-- RUNTIME DESKTOP OS INTERACTION CONTROLS -->
+  <!-- DESKTOP OPERATION SCRIPTS -->
   <script>
-    // Live OS Clock Functionality
+    // Live OS Clock
     function updateTime() {
         var currentTime = new Date().toLocaleString();
         var timeText = document.querySelector("#timeElement");
@@ -57,48 +58,78 @@
     setInterval(updateTime, 1000);
     updateTime(); 
 
-    // Window Visibility Core Elements
+    // Window Variables
     const welcomeWindow = document.getElementById("welcome");
-    const closeButton = document.getElementById("welcomeclose");
+    const vscodeWindow = document.getElementById("vscodeWindow");
+    
+    const closeWelcome = document.getElementById("welcomeclose");
+    const closeVSCode = document.getElementById("vscodeClose");
+    
     const osTrigger = document.getElementById("osTrigger");
+    const dockWelcome = document.getElementById("dockWelcome");
+    const dockVSCode = document.getElementById("dockVSCode");
 
-    // Action: Click Red Square X to close/hide window box
-    closeButton.addEventListener("click", function(e) {
-      e.stopPropagation(); // Safe protection barrier for drag tracking loops
+    let editorInstance = null; // Holds our code text container instance
+
+    // Initialize Monaco Code Frame Engine
+    function initMonaco() {
+      if (editorInstance) return; // Prevent double loads
+      require.config({ paths: { vs: 'https://jsdelivr.net' } });
+      require(['vs/editor/editor.main'], function () {
+        editorInstance = monaco.editor.create(document.getElementById('monacoContainer'), {
+          value: `// Welcome to AstroSpark Code Studio\nfunction initializeOS() {\n    console.log("AstroSparkOS running smoothly...");\n}`,
+          language: 'javascript',
+          theme: 'vs-dark',
+          automaticLayout: true
+        });
+      });
+    }
+
+    // Window Swapping Logic: Launch VS Code App and HIDE Welcome
+    dockVSCode.addEventListener("click", function() {
       welcomeWindow.style.display = "none";
+      dockWelcome.classList.remove("active-app");
+      
+      // Open and Center VS Code
+      vscodeWindow.style.top = "50%";
+      vscodeWindow.style.left = "50%";
+      vscodeWindow.style.transform = "translate(-50%, -50%)";
+      vscodeWindow.style.display = "block";
+      dockVSCode.classList.add("active-app");
+      
+      // Fire up editor canvas runtime
+      initMonaco();
     });
 
-    // Action: Click AstroSparkOS text banner to pop window back open
-    osTrigger.addEventListener("click", function() {
-      // Flushes out position modifications and resets window coordinates dead center
+    // Bring Back Welcome and Hide VS Code
+    dockWelcome.addEventListener("click", function() {
+      vscodeWindow.style.display = "none";
+      dockVSCode.classList.remove("active-app");
+      
       welcomeWindow.style.top = "50%";
       welcomeWindow.style.left = "50%";
       welcomeWindow.style.transform = "translate(-50%, -50%)";
       welcomeWindow.style.display = "block";
-    });
-        // Target the dock shortcut element
-    const dockWelcome = document.getElementById("dockWelcome");
-
-    // Action: Click the dock app symbol to restore or highlight the main window box
-    dockWelcome.addEventListener("click", function() {
-      if (welcomeWindow.style.display === "none" || welcomeWindow.style.display === "") {
-        // Run your centering initialization matrix parameters 
-        welcomeWindow.style.top = "50%";
-        welcomeWindow.style.left = "50%";
-        welcomeWindow.style.transform = "translate(-50%, -50%)";
-        welcomeWindow.style.display = "block";
-      } else {
-        // Shakes it slightly if it's already open to bring it to focus
-        welcomeWindow.style.transform = "translate(-50%, -50%) scale(1.03)";
-        setTimeout(() => {
-          welcomeWindow.style.transform = "translate(-50%, -50%) scale(1)";
-        }, 150);
-      }
+      dockWelcome.classList.add("active-app");
     });
 
+    // Close Actions
+    closeWelcome.addEventListener("click", function(e) {
+      e.stopPropagation();
+      welcomeWindow.style.display = "none";
+      dockWelcome.classList.remove("active-app");
+    });
+
+    closeVSCode.addEventListener("click", function(e) {
+      e.stopPropagation();
+      vscodeWindow.style.display = "none";
+      dockVSCode.classList.remove("active-app");
+    });
+
+    // Header click safety fallback restore
+    osTrigger.addEventListener("click", () => dockWelcome.click());
   </script>
   
-  <!-- Triggers your cursor window physics engine tracker -->
   <script src="script.js"></script>
  </body>
 </html>
