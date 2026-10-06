@@ -85,6 +85,51 @@
     .nasa-btn:hover {
       background: #1d4ed8;
     }
+
+    /* App Launcher Grid Styles */
+    .launcher-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      padding: 20px;
+      background: rgba(15, 23, 42, 0.9);
+      height: 100%;
+      box-sizing: border-box;
+      overflow-y: auto;
+      font-family: Arial, sans-serif;
+    }
+    .launcher-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+    .launcher-item:hover {
+      background: rgba(59, 130, 246, 0.2);
+      border-color: #3b82f6;
+      transform: translateY(-3px);
+    }
+    .launcher-icon {
+      font-size: 40px;
+      margin-bottom: 8px;
+    }
+    .launcher-title {
+      color: #fff;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    .launcher-desc {
+      color: #94a3b8;
+      font-size: 11px;
+      margin-top: 4px;
+    }
   </style>
 </head>
 <body>
@@ -96,6 +141,39 @@
     <p id="timeElement" class="top-bar-time"></p>
   </div>
 
+  <!-- 0. APP LAUNCHER WINDOW -->
+  <div id="launcherWindow" class="window-box draggable-window" style="display: none; width: 500px; height: 400px; padding: 10px;">
+    <div id="launcherWindowheader" class="closebutton window-drag-handle">
+      <div id="launcherClose" title="Close">✕</div>
+      <p class="window-header-title">App Launcher</p>
+      <div class="header-spacer"></div>
+    </div>
+    <div class="app-container">
+      <div class="launcher-grid">
+        <div class="launcher-item" onclick="launchApp('welcome')">
+          <div class="launcher-icon">✨</div>
+          <div class="launcher-title">Welcome</div>
+          <div class="launcher-desc">Introduction to AstroSparkOS</div>
+        </div>
+        <div class="launcher-item" onclick="launchApp('vscode')">
+          <div class="launcher-icon">🐸</div>
+          <div class="launcher-title">Flexbox Froggy</div>
+          <div class="launcher-desc">Learn CSS Flexbox interactively</div>
+        </div>
+        <div class="launcher-item" onclick="launchApp('nasa')">
+          <div class="launcher-icon">🛰️</div>
+          <div class="launcher-title">NASA Tracker</div>
+          <div class="launcher-desc">Spacecraft & station telemetry</div>
+        </div>
+        <div class="launcher-item" onclick="launchApp('browser')">
+          <div class="launcher-icon">🌐</div>
+          <div class="launcher-title">AstroBrowser</div>
+          <div class="launcher-desc">Surf the web in an iframe</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- 1. WELCOME GLASS WINDOW BOX -->
   <div id="welcome" class="window-box draggable-window">
     <div id="welcomeheader" class="closebutton window-drag-handle">
@@ -105,7 +183,7 @@
     </div>
     <h1>Welcome to AstroSpark WebOS!</h1>
     <h2>Introduction</h2>
-    <p>Hello World</p>
+    <p>Hello Galaxy!</p>
     <img src="./BlackHole.jpeg" alt="Black Hole" />
   </div>
 
@@ -152,28 +230,29 @@
       <div class="header-spacer"></div>
     </div>
     <div class="app-container">
-      <!-- Browser Toolbar with URL navigation -->
+      <!-- Toolbar for browser -->
       <div class="browser-toolbar">
         <button id="browserBack">←</button>
-        <button id="browserForward">>→</button>
+        <button id="browserForward">→</button>
         <button id="browserRefresh">↻</button>
         <input type="text" id="browserUrlInput" value="https://hackclub.com" placeholder="Enter URL and press Enter..." />
         <button id="browserGo">Go</button>
       </div>
-      <!-- Webpage View iframe -->
+      <!-- Iframe viewer -->
       <iframe id="browserFrame" src="https://hackclub.com" title="Internet Browser"></iframe>
     </div>
   </div>
 
   <!-- LIQUID TASKBAR DOCK -->
   <div class="dock-container">
+    <div id="dockLauncher" class="dock-icon" title="App Launcher">🚀</div>
     <div id="dockWelcome" class="dock-icon active-app" title="Welcome App">✨</div>
     <div id="dockVSCode" class="dock-icon" title="Flexbox Froggy App">🐸</div>
     <div id="dockNASA" class="dock-icon" title="NASA SpaceShip Tracker">🛰️</div>
     <div id="dockBrowser" class="dock-icon" title="Internet Browser">🌐</div>
   </div>
 
-  <!-- RUNTIME DESKTOP OS INTERACTION CONTROLS -->
+  <!-- Controlls -->
   <script>
     // Live OS Clock Functionality
     function updateTime() {
@@ -185,17 +264,20 @@
     updateTime(); 
 
     // Window Component State Selectors
+    const launcherWindow = document.getElementById("launcherWindow");
     const welcomeWindow = document.getElementById("welcome");
     const vscodeWindow = document.getElementById("vscodeWindow");
     const nasaWindow = document.getElementById("nasaWindow");
     const browserWindow = document.getElementById("browserWindow");
     
+    const closeLauncher = document.getElementById("launcherClose");
     const closeWelcome = document.getElementById("welcomeclose");
     const closeVSCode = document.getElementById("vscodeClose");
     const closeNASA = document.getElementById("nasaClose");
     const closeBrowser = document.getElementById("browserClose");
     
     const osTrigger = document.getElementById("osTrigger");
+    const dockLauncher = document.getElementById("dockLauncher");
     const dockWelcome = document.getElementById("dockWelcome");
     const dockVSCode = document.getElementById("dockVSCode");
     const dockNASA = document.getElementById("dockNASA");
@@ -207,17 +289,45 @@
     const browserGo = document.getElementById("browserGo");
     const browserRefresh = document.getElementById("browserRefresh");
 
-    // Helper to hide all windows and remove active dock highlights
+    // Helper to hide all primary application windows and remove active dock highlights
     function hideAllApps() {
       welcomeWindow.style.display = "none";
       vscodeWindow.style.display = "none";
       nasaWindow.style.display = "none";
       browserWindow.style.display = "none";
+      launcherWindow.style.display = "none";
       dockWelcome.classList.remove("active-app");
       dockVSCode.classList.remove("active-app");
       dockNASA.classList.remove("active-app");
       dockBrowser.classList.remove("active-app");
+      dockLauncher.classList.remove("active-app");
     }
+
+    // App Launcher Handler Function
+    function launchApp(appName) {
+      launcherWindow.style.display = "none";
+      dockLauncher.classList.remove("active-app");
+      if (appName === 'welcome') dockWelcome.click();
+      if (appName === 'vscode') dockVSCode.click();
+      if (appName === 'nasa') dockNASA.click();
+      if (appName === 'browser') dockBrowser.click();
+    }
+
+    // Window Swapping Protocol: Open Launcher
+    dockLauncher.addEventListener("click", function() {
+      const isVisible = launcherWindow.style.display === "block";
+      if (isVisible) {
+        launcherWindow.style.display = "none";
+        dockLauncher.classList.remove("active-app");
+      } else {
+        launcherWindow.style.top = "50%";
+        launcherWindow.style.left = "50%";
+        launcherWindow.style.transform = "translate(-50%, -50%)";
+        launcherWindow.style.display = "block";
+        dockLauncher.classList.add("active-app");
+        launcherWindow.style.zIndex = 100;
+      }
+    });
 
     // Window Swapping Protocol: Open Welcome Page
     dockWelcome.addEventListener("click", function() {
@@ -227,6 +337,7 @@
       welcomeWindow.style.transform = "translate(-50%, -50%)";
       welcomeWindow.style.display = "block";
       dockWelcome.classList.add("active-app");
+      welcomeWindow.style.zIndex = 100;
     });
 
     // Window Swapping Protocol: Open Flexbox Froggy
@@ -237,6 +348,7 @@
       vscodeWindow.style.transform = "translate(-50%, -50%)";
       vscodeWindow.style.display = "block";
       dockVSCode.classList.add("active-app");
+      vscodeWindow.style.zIndex = 100;
     });
 
     // Window Swapping Protocol: Open NASA Tracker
@@ -247,6 +359,7 @@
       nasaWindow.style.transform = "translate(-50%, -50%)";
       nasaWindow.style.display = "block";
       dockNASA.classList.add("active-app");
+      nasaWindow.style.zIndex = 100;
     });
 
     // Window Swapping Protocol: Open Browser
@@ -257,6 +370,7 @@
       browserWindow.style.transform = "translate(-50%, -50%)";
       browserWindow.style.display = "block";
       dockBrowser.classList.add("active-app");
+      browserWindow.style.zIndex = 100;
     });
 
     // Browser URL Navigation Handlers
@@ -277,6 +391,7 @@
     });
 
     // Close Button Action Handlers
+    closeLauncher.addEventListener("click", (e) => { e.stopPropagation(); launcherWindow.style.display = "none"; dockLauncher.classList.remove("active-app"); });
     closeWelcome.addEventListener("click", (e) => { e.stopPropagation(); welcomeWindow.style.display = "none"; dockWelcome.classList.remove("active-app"); });
     closeVSCode.addEventListener("click", (e) => { e.stopPropagation(); vscodeWindow.style.display = "none"; dockVSCode.classList.remove("active-app"); });
     closeNASA.addEventListener("click", (e) => { e.stopPropagation(); nasaWindow.style.display = "none"; dockNASA.classList.remove("active-app"); });
@@ -284,7 +399,7 @@
 
     osTrigger.addEventListener("click", () => dockWelcome.click());
 
-    // 🖱️ DRAGGABLE WINDOW LOGIC FOR ALL WINDOWS
+    // 🖱️️ DRAGGABLE WINDOW LOGIC FOR ALL WINDOWS
     document.querySelectorAll('.draggable-window').forEach(windowBox => {
       const header = windowBox.querySelector('.window-drag-handle');
       let isDragging = false;
