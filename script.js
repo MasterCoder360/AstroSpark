@@ -61,7 +61,7 @@ const APPS = {
     title: "AstroSpark", icon: "✨", desc: "Introduction to AstroSparkOS", w: 440, h: 400,
     build(c) {
       c.innerHTML = `<div class="pad"><h1>Welcome to AstroSpark WebOS!</h1><h2>Introduction</h2>
-        <p>Hello Galaxy! Open the launcher (first icon in the dock) to explore apps. Click a window to focus it, drag its title bar to move it.</p>
+        <p>Hello Galaxy! This WebOS was created by Raahil. New features are still being developed, so check this OS actively! Open the launcher (first icon in the dock) to explore apps. Click a window to focus it, drag its title bar to move it.</p>
         <img src="./BlackHole.jpeg" alt="Black Hole"></div>`;
     },
   },
@@ -80,7 +80,7 @@ const APPS = {
         <div class="iss-stats"></div>
         <a class="nasa-btn" target="_blank" href="https://spotthestation.nasa.gov/">Spot The Station</a>
         <a class="nasa-btn" target="_blank" href="https://eyes.nasa.gov/" style="background:#059669;margin-left:8px">NASA Eyes (3D)</a>
-        <p class="iss-note">Live data from api.wheretheiss.at, refreshed every 5 s. Map is a simplified outline.</p></div>`;
+        <p class="iss-note">Live data from api.wheretheiss.at, refreshed every 5 s. This is a real location tracker for the ISS.</p></div>`;
       const cv = c.querySelector("canvas"), g = cv.getContext("2d"), stats = c.querySelector(".iss-stats");
       const X = lon => (lon + 180) / 360 * cv.width, Y = lat => (90 - lat) / 180 * cv.height;
       const LAND = [
