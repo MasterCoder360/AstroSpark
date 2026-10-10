@@ -6,7 +6,7 @@ window.addEventListener("load", () => {
   const steps = [
     [15, "Loading kernel and system memory..."],
     [38, "Mounting virtual file system..."],
-    [60, "Calibrating quantum gravitational matrix..."],
+    [60, "Loading desktop services..."],
     [85, "Starting window manager and desktop dock..."],
     [100, "Welcome to AstroSparkOS!"],
   ];
@@ -31,6 +31,9 @@ const ICONS = {
   browser:  ["#38bdf8", "#0369a1", '<circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/>'],
   notes:    ["#fbbf24", "#d97706", '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3.5"/>'],
   calc:     ["#a78bfa", "#6d28d9", '<rect x="5" y="3" width="14" height="18" rx="2"/><rect x="8" y="6" width="8" height="3"/><g fill="#fff" stroke="none"><circle cx="9" cy="13" r="1"/><circle cx="12" cy="13" r="1"/><circle cx="15" cy="13" r="1"/><circle cx="9" cy="17" r="1"/><circle cx="12" cy="17" r="1"/><circle cx="15" cy="17" r="1"/></g>'],
+  calendar: ["#fb7185", "#be123c", '<rect x="4" y="5" width="16" height="16" rx="2"/><path d="M8 3v4M16 3v4M4 10h16M8 14h2M14 14h2M8 17h2"/>'],
+  files: ["#38bdf8", "#0369a1", '<path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>'],  
+   settings: ["#94a3b8", "#334155", '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3M4.93 4.93l2.12 2.12m9.9 9.9 2.12 2.12m0-14.14-2.12 2.12m-9.9 9.9-2.12 2.12"/>'],
   terminal: ["#475569", "#0f172a", '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 10l3 2-3 2M12 15h5"/>'],
 };
 let gradN = 0;
@@ -61,7 +64,7 @@ const APPS = {
     title: "AstroSpark", icon: "✨", desc: "Introduction to AstroSparkOS", w: 440, h: 400,
     build(c) {
       c.innerHTML = `<div class="pad"><h1>Welcome to AstroSpark WebOS!</h1><h2>Introduction</h2>
-        <p>Hello Galaxy! This WebOS was created by Raahil. New features are still being developed, so check this OS actively! Open the launcher (first icon in the dock) to explore apps. Click a window to focus it, drag its title bar to move it.</p>
+        <p>AstroSpark is a small browser-based desktop with a collection of useful tools and space-themed apps. Use the dock to launch an app, drag a window by its title bar, or open the launcher to see everything available.</p>
         <img src="./BlackHole.jpeg" alt="Black Hole"></div>`;
     },
   },
@@ -74,64 +77,82 @@ const APPS = {
   },
 
   iss: {
-    title: "ISS Tracker", icon: "🛰️", desc: "Live International Space Station position", w: 760, h: 620,
+    title: "ISS Tracker", icon: "🛰️", desc: "Live ISS position on a detailed world map", w: 820, h: 680,
     build(c) {
-      c.innerHTML = `<div class="iss"><canvas width="1000" height="500"></canvas>
+      c.innerHTML = `<div class="iss">
+        <div class="iss-toolbar"><div><strong>ISS / LIVE TRACKING</strong><span class="iss-live"><i></i> LIVE TELEMETRY</span></div>
+          <button class="iss-recenter">Recenter</button></div>
+        <div class="iss-map" role="application" aria-label="Interactive map showing the International Space Station"></div>
         <div class="iss-stats"></div>
-        <a class="nasa-btn" target="_blank" href="https://spotthestation.nasa.gov/">Spot The Station</a>
-        <a class="nasa-btn" target="_blank" href="https://eyes.nasa.gov/" style="background:#059669;margin-left:8px">NASA Eyes (3D)</a>
-        <p class="iss-note">Live data from api.wheretheiss.at, refreshed every 5 s. This is a real location tracker for the ISS.</p></div>`;
-      const cv = c.querySelector("canvas"), g = cv.getContext("2d"), stats = c.querySelector(".iss-stats");
-      const X = lon => (lon + 180) / 360 * cv.width, Y = lat => (90 - lat) / 180 * cv.height;
-      const LAND = [
-        [[-168,66],[-140,70],[-95,72],[-80,63],[-62,58],[-55,50],[-70,42],[-76,35],[-81,25],[-97,26],[-105,22],[-96,16],[-83,9],[-80,8],[-90,15],[-110,24],[-117,32],[-124,40],[-125,49],[-140,59],[-152,58],[-165,60]],
-        [[-80,8],[-60,10],[-50,0],[-35,-6],[-40,-22],[-48,-28],[-58,-38],[-65,-42],[-68,-55],[-74,-50],[-72,-30],[-70,-18],[-81,-5]],
-        [[-17,21],[-10,32],[10,37],[32,31],[43,12],[51,11],[40,-5],[40,-16],[33,-27],[20,-35],[12,-17],[9,-1],[-8,4],[-17,14]],
-        [[-10,36],[-9,43],[-2,48],[5,53],[10,57],[20,70],[40,68],[70,73],[110,77],[140,72],[180,68],[170,60],[160,55],[140,52],[142,46],[130,35],[122,30],[120,22],[108,10],[100,2],[104,10],[95,17],[80,8],[73,18],[66,25],[57,25],[50,30],[56,18],[43,13],[35,28],[28,36],[22,37],[12,44],[3,43]],
-        [[114,-22],[130,-12],[142,-11],[153,-26],[147,-38],[135,-35],[115,-34]],
-        [[-55,60],[-45,60],[-20,70],[-20,82],[-60,82],[-72,76]],
-        [[-180,-70],[180,-70],[180,-90],[-180,-90]],
-      ];
-      let trail = [], last = null, timer = null;
+        <div class="iss-footer"><span class="iss-status">Connecting to telemetry…</span><span>Map © OpenStreetMap contributors</span></div>
+        <div class="iss-links"><a class="nasa-btn" target="_blank" rel="noopener" href="https://spotthestation.nasa.gov/">Spot The Station ↗</a>
+        <a class="nasa-btn" target="_blank" rel="noopener" href="https://eyes.nasa.gov/" >NASA Eyes 3D ↗</a></div></div>`;
+      const mapEl = c.querySelector(".iss-map"), stats = c.querySelector(".iss-stats");
+      const status = c.querySelector(".iss-status");
+      let map, marker, footprint, trailLine, trail = [], last = null, timer = null, alive = true;
+      const cell = (k, v) => `<div class="iss-stat"><span>${k}</span><b>${v}</b></div>`;
+      function initMap() {
+        if (map || !window.L) return;
+        map = L.map(mapEl, { worldCopyJump: true, zoomControl: true, minZoom: 2 }).setView([15, 0], 2);
 
-      function draw() {
-        g.clearRect(0, 0, cv.width, cv.height);
-        g.strokeStyle = "rgba(255,255,255,0.08)"; g.lineWidth = 1;
-        for (let lon = -180; lon <= 180; lon += 30) { g.beginPath(); g.moveTo(X(lon), 0); g.lineTo(X(lon), cv.height); g.stroke(); }
-        for (let lat = -90; lat <= 90; lat += 30) { g.beginPath(); g.moveTo(0, Y(lat)); g.lineTo(cv.width, Y(lat)); g.stroke(); }
-        g.fillStyle = "#1e3a5f";
-        LAND.forEach(poly => { g.beginPath(); poly.forEach(([lo, la], i) => i ? g.lineTo(X(lo), Y(la)) : g.moveTo(X(lo), Y(la))); g.closePath(); g.fill(); });
-        g.strokeStyle = "#f59e0b"; g.lineWidth = 2;
-        for (let i = 1; i < trail.length; i++) {
-          if (Math.abs(trail[i][0] - trail[i - 1][0]) > 180) continue; // skip antimeridian jumps
-          g.beginPath(); g.moveTo(X(trail[i - 1][0]), Y(trail[i - 1][1])); g.lineTo(X(trail[i][0]), Y(trail[i][1])); g.stroke();
-        }
-        if (!last) return;
-        const x = X(last.longitude), y = Y(last.latitude), r = last.footprint / 2 / 111;
-        g.beginPath(); g.ellipse(x, y, r * cv.width / 360, r * cv.height / 180, 0, 0, 7);
-        g.fillStyle = "rgba(96,165,250,0.15)"; g.fill(); g.strokeStyle = "#60a5fa"; g.stroke();
-        g.beginPath(); g.arc(x, y, 7, 0, 7); g.fillStyle = "#fff"; g.shadowColor = "#f59e0b"; g.shadowBlur = 18; g.fill(); g.shadowBlur = 0;
-        g.font = "bold 18px Arial"; g.fillStyle = "#fff"; g.fillText("ISS", x + 12, y - 10);
+
+L.tileLayer(
+  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+  {
+    maxZoom: 19,
+    attribution: "Tiles &copy; Esri"
+  }
+).addTo(map);
+
+
+        const issIcon = L.divIcon({ className: "iss-map-icon", html: '<span>🛰</span>', iconSize: [34,34], iconAnchor: [17,17] });
+        marker = L.marker([0,0], { icon: issIcon, title: "International Space Station" }).addTo(map)
+          .bindTooltip("International Space Station", { direction: "top", offset: [0,-12] });
+        footprint = L.circle([0,0], { radius: 2200000, color: "#60a5fa", weight: 1, fillColor: "#60a5fa", fillOpacity: .10 }).addTo(map);
+        trailLine = L.polyline([], { color: "#f59e0b", weight: 2, opacity: .9 }).addTo(map);
+        if (last) updateMap();
+        setTimeout(() => map && map.invalidateSize(), 80);
       }
-
+      function updateMap() {
+        if (!map || !last) return;
+        const pos = [last.latitude, last.longitude];
+        marker.setLatLng(pos);
+        footprint.setLatLng(pos);
+        // Break the ground track at the antimeridian to avoid a line across the entire map.
+        const segments = []; let segment = [];
+        trail.forEach((p, i) => {
+          if (i && Math.abs(p[1] - trail[i-1][1]) > 180) { if (segment.length) segments.push(segment); segment = []; }
+          segment.push([p[0], p[1]]);
+        });
+        if (segment.length) segments.push(segment);
+        trailLine.setLatLngs(segments);
+      }
       async function poll() {
         try {
-          const res = await fetch("https://api.wheretheiss.at/v1/satellites/25544");
-          if (!res.ok) throw new Error(res.status);
+          const res = await fetch("https://api.wheretheiss.at/v1/satellites/25544", { cache: "no-store" });
+          if (!res.ok) throw new Error("Telemetry request failed (" + res.status + ")");
           last = await res.json();
-          trail.push([last.longitude, last.latitude]); if (trail.length > 120) trail.shift();
-          const cell = (k, v) => `<div>${k}<b>${v}</b></div>`;
-          stats.innerHTML = cell("Latitude", last.latitude.toFixed(3) + "°") + cell("Longitude", last.longitude.toFixed(3) + "°") +
-            cell("Altitude", last.altitude.toFixed(1) + " km") + cell("Speed", Math.round(last.velocity).toLocaleString() + " km/h") +
-            cell("Visibility", last.visibility) + cell("Updated", new Date(last.timestamp * 1000).toLocaleTimeString());
-          draw();
-        } catch (e) { stats.textContent = "Couldn't reach the ISS API. Check your connection; retrying..."; }
+          if (!Number.isFinite(last.latitude) || !Number.isFinite(last.longitude)) throw new Error("Invalid coordinates received");
+          trail.push([last.latitude, last.longitude]);
+          if (trail.length > 180) trail.shift();
+          stats.innerHTML = cell("Latitude", last.latitude.toFixed(4) + "°") +
+            cell("Longitude", last.longitude.toFixed(4) + "°") +
+            cell("Altitude", last.altitude.toFixed(1) + " km") +
+            cell("Orbital speed", Math.round(last.velocity).toLocaleString() + " km/h") +
+            cell("Ground footprint", Math.round(last.footprint).toLocaleString() + " km") +
+            cell("Last update", new Date(last.timestamp * 1000).toLocaleTimeString());
+          status.textContent = "Telemetry updated " + new Date().toLocaleTimeString();
+          initMap(); updateMap();
+        } catch (e) { status.textContent = "Telemetry unavailable — retrying in 5 seconds"; }
       }
-      draw();
+      c.querySelector(".iss-recenter").addEventListener("click", () => {
+        if (map && last) map.setView([last.latitude, last.longitude], Math.max(map.getZoom(), 3));
+      });
+      initMap();
+      poll();
       return {
-        onShow() { poll(); clearInterval(timer); timer = setInterval(poll, 5000); },
-        onHide() { clearInterval(timer); },
-        getLast: () => last,
+        onShow() { alive = true; initMap(); if (map) setTimeout(() => map.invalidateSize(), 80); poll(); clearInterval(timer); timer = setInterval(() => { if (alive) poll(); }, 5000); },
+        onHide() { alive = false; clearInterval(timer); }
       };
     },
   },
@@ -197,10 +218,62 @@ const APPS = {
     },
   },
 
+  calendar: {
+    title: "Calendar", icon: "📅", desc: "Monthly calendar and daily planner", w: 440, h: 470,
+    build(c) {
+      c.innerHTML = `<div class="calendar-app"><div class="calendar-head"><button data-step="-1">‹</button><strong></strong><button data-step="1">›</button></div><div class="calendar-grid"></div><div class="calendar-agenda"><b>Selected day</b><span class="selected-date"></span><input placeholder="Add an event and press Enter"></div></div>`;
+      const head = c.querySelector(".calendar-head strong"), grid = c.querySelector(".calendar-grid"), selected = c.querySelector(".selected-date"), eventInput = c.querySelector("input");
+      let view = new Date(), chosen = new Date(), events = {};
+      try { events = JSON.parse(localStorage.getItem("astrospark.calendar") || "{}"); } catch (_) {}
+      const key = d => `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+      function render() {
+        head.textContent = view.toLocaleDateString(undefined,{month:"long",year:"numeric"});
+        grid.innerHTML = ["Su","Mo","Tu","We","Th","Fr","Sa"].map(x=>`<div class="weekday">${x}</div>`).join("");
+        const first = new Date(view.getFullYear(),view.getMonth(),1).getDay(), count = new Date(view.getFullYear(),view.getMonth()+1,0).getDate();
+        for(let i=0;i<first;i++) grid.insertAdjacentHTML("beforeend",'<div class="calendar-empty"></div>');
+        for(let n=1;n<=count;n++) { const d=new Date(view.getFullYear(),view.getMonth(),n); const b=document.createElement("button"); b.className="calendar-day"+(key(d)===key(chosen)?" selected":"")+(key(d)===key(new Date())?" today":""); b.textContent=n; if(events[key(d)]?.length)b.classList.add("has-event"); b.onclick=()=>{chosen=d;render();}; grid.appendChild(b); }
+        selected.textContent = chosen.toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric",year:"numeric"});
+        const old=c.querySelector(".event-list"); if(old)old.remove();
+        const list=document.createElement("div"); list.className="event-list"; (events[key(chosen)]||[]).forEach(e=>{const p=document.createElement("p");p.textContent="• "+e;list.appendChild(p);}); c.querySelector(".calendar-agenda").appendChild(list);
+      }
+      c.querySelector(".calendar-head").addEventListener("click",e=>{const n=Number(e.target.dataset.step);if(n){view=new Date(view.getFullYear(),view.getMonth()+n,1);render();}});
+      eventInput.addEventListener("keydown",e=>{if(e.key==="Enter"&&eventInput.value.trim()){(events[key(chosen)] ||= []).push(eventInput.value.trim());try{localStorage.setItem("astrospark.calendar",JSON.stringify(events));}catch(_){} eventInput.value="";render();}});
+      render();
+    }
+  },
+  files: {
+    title: "File Cabinet", icon: "📁", desc: "Browse local AstroSpark workspace shortcuts", w: 500, h: 430,
+    build(c) {
+      const items = [
+        ["AstroSparkIcon.png","Application icon","image","./AstroSparkIcon.png"],
+        ["BlackHole.jpeg","Desktop wallpaper source","image","./BlackHole.jpeg"],
+        ["Blackhole.gif","Animated wallpaper","image","./Blackhole.gif"],
+        ["Notes","Personal notes","app","notes"],["Calendar","Events and reminders","app","calendar"],
+        ["ISS Tracker","Live orbital map","app","iss"],["Terminal","AstroShell command line","app","terminal"]
+      ];
+      c.innerHTML = `<div class="files-app"><div class="files-path">⌂ &nbsp; Home / AstroSpark</div><div class="files-list"></div><p class="files-foot">Workspace shortcuts · browser-based storage</p></div>`;
+      const list=c.querySelector(".files-list");
+      items.forEach(([name,desc,type,target])=>{const row=document.createElement("button");row.className="file-row";row.innerHTML=`<span class="file-symbol">${type==="image"?"▧":type==="app"?"◈":"▤"}</span><span><b>${name}</b><small>${desc}</small></span><span class="file-arrow">↗</span>`;row.onclick=()=>{if(type==="app")openWin(target);else window.open(target,"_blank","noopener");};list.appendChild(row);});
+    }
+  },
+  settings: {
+    title: "System Settings", icon: "⚙️", desc: "Personalize the desktop", w: 440, h: 430,
+    build(c) {
+      c.innerHTML = `<div class="settings-app"><h2>Appearance</h2><p>Choose the desktop glass tint.</p><div class="setting-options"><button data-tint="blue">Ocean</button><button data-tint="violet">Nebula</button><button data-tint="neutral">Graphite</button></div><h2>Desktop</h2><label><input type="checkbox" class="motion-toggle"> Reduce interface motion</label><h2>System</h2><p>AstroSparkOS · Browser edition</p><button class="settings-reset">Reset appearance</button></div>`;
+      const root=document.documentElement;
+      const apply=t=>{root.dataset.tint=t;try{localStorage.setItem("astrospark.tint",t);}catch(_){}};
+      try{apply(localStorage.getItem("astrospark.tint")||"blue");}catch(_){}
+      c.querySelectorAll("[data-tint]").forEach(b=>b.onclick=()=>apply(b.dataset.tint));
+      const motion=c.querySelector(".motion-toggle");try{motion.checked=localStorage.getItem("astrospark.reduceMotion")==="1";}catch(_){}
+      motion.onchange=()=>{root.classList.toggle("reduce-motion",motion.checked);try{localStorage.setItem("astrospark.reduceMotion",motion.checked?"1":"0");}catch(_){}};
+      try{root.classList.toggle("reduce-motion",localStorage.getItem("astrospark.reduceMotion")==="1");}catch(_){}
+      c.querySelector(".settings-reset").onclick=()=>{apply("blue");motion.checked=false;root.classList.remove("reduce-motion");};
+    }
+  },
   terminal: {
     title: "Terminal", icon: "💻", desc: "AstroShell command line", w: 600, h: 400,
     build(c) {
-      c.innerHTML = '<div class="term"><div class="term-out">AstroShell v1.0. Type "help" to begin.\n</div><div class="term-line"><span>astro@spark:~$</span><input spellcheck="false" autocomplete="off"></div></div>';
+      c.innerHTML = '<div class="term"><div class="term-out">AstroShell v1.0 — type "help" for commands.\n</div><div class="term-line"><span>astro@spark:~$</span><input spellcheck="false" autocomplete="off"></div></div>';
       const term = c.firstChild, out = c.querySelector(".term-out"), input = c.querySelector("input");
       const print = t => { out.textContent += t + "\n"; term.scrollTop = term.scrollHeight; };
       const cmds = {
@@ -239,7 +312,7 @@ function createWindow(id) {
   const a = APPS[id], el = document.createElement("div");
   el.className = "window-box";
   el.style.width = a.w + "px"; el.style.height = a.h + "px";
-  el.innerHTML = `<div class="window-drag-handle"><div class="win-close" title="Close">✕</div><p class="window-header-title">${a.title}</p><div class="header-spacer"></div></div><div class="app-container"></div>`;
+  el.innerHTML = `<div class="window-drag-handle"><div class="window-controls"><button class="win-close" title="Close" aria-label="Close">×</button><button class="win-minimize" title="Minimize" aria-label="Minimize">−</button><button class="win-maximize" title="Maximize" aria-label="Maximize">□</button></div><p class="window-header-title">${a.title}</p><div class="header-spacer"></div></div><div class="app-container"></div>`;
   const hooks = a.build(el.querySelector(".app-container")) || {};
   const off = (cascade++ % 6) * 28;
   el.style.left = Math.max(0, (innerWidth - a.w) / 2 + off - 70) + "px";
@@ -247,6 +320,8 @@ function createWindow(id) {
   document.body.appendChild(el);
   el.addEventListener("mousedown", () => focusWin(id));
   el.querySelector(".win-close").addEventListener("click", e => { e.stopPropagation(); closeWin(id); });
+  el.querySelector(".win-minimize").addEventListener("click", e => { e.stopPropagation(); minimizeWin(id); });
+  el.querySelector(".win-maximize").addEventListener("click", e => { e.stopPropagation(); toggleMaximize(id); });
   makeDraggable(el, id);
   return (wins[id] = { el, hooks, open: false });
 }
@@ -262,6 +337,34 @@ function openWin(id) {
   const wasOpen = w.open;
   w.el.style.display = "flex"; w.open = true;
   if (!wasOpen && w.hooks.onShow) w.hooks.onShow();
+  focusWin(id);
+}
+
+function minimizeWin(id) {
+  const w = wins[id]; if (!w || !w.open) return;
+  w.el.style.display = "none"; w.open = false; w.minimized = true;
+  w.el.classList.remove("focused");
+  if (w.hooks.onHide) w.hooks.onHide();
+  if (focusedId === id) {
+    focusedId = null;
+    const next = Object.entries(wins).filter(([, x]) => x.open).sort((a, b) => Number(b[1].el.style.zIndex) - Number(a[1].el.style.zIndex))[0];
+    if (next) focusWin(next[0]);
+  }
+  renderDock();
+}
+function toggleMaximize(id) {
+  const w = wins[id]; if (!w) return;
+  if (!w.restoreRect) {
+    const r = w.el.getBoundingClientRect();
+    w.restoreRect = { left: w.el.style.left || r.left + "px", top: w.el.style.top || r.top + "px", width: w.el.style.width, height: w.el.style.height };
+    w.el.style.left = "8px"; w.el.style.top = "40px";
+    w.el.style.width = Math.max(280, innerWidth - 16) + "px";
+    w.el.style.height = Math.max(220, innerHeight - 112) + "px";
+    w.el.classList.add("maximized");
+  } else {
+    Object.assign(w.el.style, w.restoreRect); w.restoreRect = null;
+    w.el.classList.remove("maximized");
+  }
   focusWin(id);
 }
 
@@ -299,7 +402,7 @@ function renderDock() {
 let drag = null;
 function makeDraggable(el, id) {
   el.querySelector(".window-drag-handle").addEventListener("mousedown", e => {
-    if (e.target.closest(".win-close")) return;
+    if (e.target.closest(".window-controls")) return;
     const r = el.getBoundingClientRect();
     drag = { el, dx: e.clientX - r.left, dy: e.clientY - r.top };
     document.body.classList.add("dragging");
