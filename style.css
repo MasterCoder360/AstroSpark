@@ -1,8 +1,6 @@
-/* ==========================================
-   GLOBAL DESKTOP SCREEN CANVAS
-   ========================================== */
+/* ---- Desktop ---- */
 body {
-  background-image: url('./Blackhole.gif'); 
+  background-image: url('./Blackhole.gif');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -11,9 +9,7 @@ body {
   overflow: hidden;
 }
 
-/* ==========================================
-   TOP BAR COMPONENT
-   ========================================== */
+/* ---- Top bar ---- */
 .top-bar {
   position: absolute;
   width: 100%;
@@ -55,9 +51,7 @@ body {
   user-select: none;
 }
 
-/* ==========================================
-   DRAGGABLE WINDOW COMPONENT
-   ========================================== */
+/* ---- Windows ---- */
 .window-box {
   position: absolute;
   top: 50%;
@@ -76,7 +70,6 @@ body {
   user-select: none;
 }
 
-/* Window Drag Handle Row */
 .window-drag-handle {
   width: 100%;
   display: flex;
@@ -86,7 +79,6 @@ body {
   margin-bottom: 15px;
 }
 
-/* Red Close Box with Center-Flex Alignment Matrix */
 .win-close {
   width: 16px;
   height: 16px;
@@ -110,16 +102,13 @@ body {
   font-weight: 500;
 }
 
-/* Invisible block to perfectly center the title against the close button */
 .header-spacer {
   width: 16px;
   margin-right: 6px;
   height: 16px;
 }
 
-/* ==========================================
-   WINDOW INTERIOR CONTENT
-   ========================================== */
+/* ---- Window content ---- */
 .window-box h1 {
   font-size: 22px;
   margin: 10px 0 5px 0;
@@ -144,9 +133,7 @@ body {
   display: block;
 }
 
-/* ==========================================
-   LIQUID GLASS TASKBAR DOCK
-   ========================================== */
+/* ---- Dock ---- */
 .dock-container {
   position: absolute;
   bottom: 20px;
@@ -210,9 +197,7 @@ body {
   box-shadow: 0 0 6px #fff;
 }
 
-/* ==========================================
-   REALISTIC BOOT SCREEN ANIMATION
-   ========================================== */
+/* ---- Boot screen ---- */
 .startup-screen {
   position: fixed;
   top: 0;
@@ -242,21 +227,6 @@ body {
   width: 320px;
 }
 
-.startup-logo {
-  font-size: 52px;
-  margin-bottom: 12px;
-  filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.5));
-  animation: startupFloat 2s infinite ease-in-out;
-}
-
-.startup-title {
-  font-size: 26px;
-  font-weight: 600;
-  letter-spacing: 1px;
-  margin: 0 0 20px 0;
-}
-
-/* Progress Bar Styles */
 .boot-progress-container {
   width: 100%;
   height: 6px;
@@ -290,13 +260,11 @@ body {
   50% { transform: translateY(-5px); }
 }
 
-/* ==========================================
-   WINDOW MANAGER + APPS (added)
-   ========================================== */
+/* ---- Apps ---- */
 .window-box { transform: none; display: flex; flex-direction: column; box-sizing: border-box; padding: 10px; }
 .window-box:not(.focused) { opacity: 0.93; }
 .window-box.focused { border-color: rgba(255,255,255,0.7); box-shadow: inset 0 0 10px rgba(255,255,255,0.3), 0 10px 40px rgba(0,0,0,0.55); }
-/* iframes swallow mouse events, so only the focused window's iframe is clickable; all are inert while dragging */
+/* only the focused window's iframe takes clicks; all are inert while dragging */
 .window-box:not(.focused) iframe, body.dragging iframe { pointer-events: none; }
 
 .app-container { flex: 1; min-height: 0; border-radius: 6px; overflow: hidden; border: 1px solid rgba(255,255,255,0.2); background: #111; color: #fff; display: flex; flex-direction: column; }
@@ -319,11 +287,9 @@ body {
 .launcher-desc { color: #94a3b8; font-size: 11px; margin-top: 4px; }
 
 .iss { padding: 12px; overflow-y: auto; font-family: Arial, sans-serif; background: linear-gradient(135deg,#0b0d19,#1a1c29); }
-.iss canvas { width: 100%; aspect-ratio: 2 / 1; border-radius: 6px; border: 1px solid #334; background: #0a1226; display: block; }
 .iss-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0; font-size: 12px; }
 .iss-stats div { background: rgba(255,255,255,0.06); padding: 6px 8px; border-radius: 6px; }
 .iss-stats b { display: block; font-size: 15px; color: #60a5fa; }
-.iss-note { font-size: 11px; color: #94a3b8; margin-top: 8px; }
 
 .term { flex: 1; background: #0c0c0c; font: 13px monospace; color: #4ade80; padding: 10px; overflow-y: auto; user-select: text; }
 .term-out { white-space: pre-wrap; }
@@ -337,7 +303,6 @@ body {
 .calc-keys button { background: #2d2d33; color: #fff; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; }
 .calc-keys button:hover { background: #3b82f6; }
 
-/* Boot screen logo image */
 .startup-content { width: 360px; }
 .startup-logo-img {
   display: block;
@@ -348,16 +313,15 @@ body {
   animation: startupFloat 2s infinite ease-in-out;
 }
 
-/* SVG app icons */
 .dock-icon { width: 48px; height: 48px; background: none; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
 .dock-icon:hover { background: none; box-shadow: 0 10px 20px rgba(0,0,0,0.45); }
 .dock-icon svg, .launcher-icon svg { display: block; width: 100%; height: 100%; }
 .launcher-icon { width: 52px; height: 52px; font-size: 0; }
 
-/* AstroSpark desktop refinements */
-:root { --desktop-tint: rgba(30, 41, 59, .78); --accent: #60a5fa; }
-:root[data-tint="violet"] { --desktop-tint: rgba(76, 29, 149, .76); --accent: #c4b5fd; }
-:root[data-tint="neutral"] { --desktop-tint: rgba(31, 41, 55, .82); --accent: #d1d5db; }
+/* ---- Theme ---- */
+:root { --tint-rgb: 30, 41, 59; --window-alpha: .78; --dock-size: 43px; --accent: #60a5fa; --desktop-tint: rgba(var(--tint-rgb), var(--window-alpha)); }
+:root[data-tint="violet"] { --tint-rgb: 76, 29, 149; --accent: #c4b5fd; }
+:root[data-tint="neutral"] { --tint-rgb: 31, 41, 55; --accent: #d1d5db; }
 .top-bar { min-height: 34px; background: rgba(12, 16, 30, .55); border-bottom-color: rgba(255,255,255,.12); box-shadow: 0 3px 14px rgba(0,0,0,.16); }
 .top-bar p { font-size: 12px; }
 .top-bar-badge { letter-spacing: .02em; }
@@ -366,7 +330,7 @@ body {
 .window-drag-handle { min-height: 26px; margin-bottom: 7px; }
 .app-container { border-color: rgba(255,255,255,.13); }
 .dock-container { bottom: 12px; gap: 9px; padding: 8px 14px; background: rgba(14,18,32,.55); border-color: rgba(255,255,255,.16); }
-.dock-icon { width: 43px; height: 43px; }
+.dock-icon { width: var(--dock-size); height: var(--dock-size); }
 .dock-icon.active-app::after { bottom: -4px; }
 .iss { height: 100%; box-sizing: border-box; padding: 12px; background: #0b1220; color: #e5edf8; display: flex; flex-direction: column; gap: 10px; }
 .iss-toolbar { display:flex; justify-content:space-between; align-items:center; gap:12px; font-size:12px; letter-spacing:.06em; }
@@ -411,10 +375,17 @@ body {
 .file-arrow { color:#64748b; }
 .settings-app h2 { font-size:13px; margin:5px 0 8px; color:#bfdbfe; }
 .settings-app p { color:#94a3b8; margin:0 0 12px; }
-.settings-app label { display:flex; align-items:center; gap:8px; margin:16px 0 22px; }
-.setting-options { display:flex; gap:8px; margin-bottom:24px; }
+.settings-app label { display:flex; align-items:center; gap:8px; }
+.setting-options { display:flex; gap:8px; }
 .setting-options button:hover,.settings-reset:hover { border-color:#60a5fa; }
-body.reduce-motion *, html.reduce-motion * { animation-duration:.01ms !important; transition-duration:.01ms !important; scroll-behavior:auto !important; }
+.setting-options button.active { background:#1d4ed8; border-color:#60a5fa; }
+.setting-options { flex-wrap:wrap; margin-bottom:16px; }
+.settings-app label { margin:10px 0; }
+.settings-app input[type=range] { width:100%; accent-color:#60a5fa; margin-bottom:16px; }
+.settings-app .opacity-value { color:#bfdbfe; margin-left:6px; }
+.settings-app h2 { margin-top:14px; }
+.settings-app h2:first-child { margin-top:0; }
+html.reduce-motion * { animation-duration:.01ms !important; transition-duration:.01ms !important; scroll-behavior:auto !important; }
 @media(max-width:700px) {
   .window-box { min-width:0; max-width:calc(100vw - 12px); max-height:calc(100vh - 100px); }
   .iss-stats { grid-template-columns:repeat(3,minmax(0,1fr)); }
@@ -424,7 +395,7 @@ body.reduce-motion *, html.reduce-motion * { animation-duration:.01ms !important
 }
 
 
-/* Window controls added without replacing the original app styles */
+/* ---- Window controls ---- */
 .window-controls { display:flex; align-items:center; gap:6px; flex-shrink:0; }
 .window-controls button { width:18px; height:18px; padding:0; border:0; border-radius:50%; color:#fff; font:bold 13px/18px Arial,sans-serif; cursor:pointer; display:flex; align-items:center; justify-content:center; }
 .window-controls .win-close { background:#ec6b5e; margin:0; font-size:12px; }
@@ -435,7 +406,6 @@ body.reduce-motion *, html.reduce-motion * { animation-duration:.01ms !important
 .header-spacer { width:60px; flex-shrink:0; }
 .window-box.maximized { border-radius:8px; }
 
-/* Fix Settings icon alignment */
 .dock-icon,
 .app-icon {
   display: flex;
@@ -448,3 +418,16 @@ body.reduce-motion *, html.reduce-motion * { animation-duration:.01ms !important
   display: block;
   margin: auto;
 }
+
+/* ---- Who Am I ---- */
+.whoami { height:100%; box-sizing:border-box; padding:18px; overflow:auto; background:#101827; color:#e5edf8; font:13px/1.5 Arial,sans-serif; user-select:text; }
+.whoami-head { display:flex; align-items:center; gap:14px; margin-bottom:6px; }
+.whoami-photo { width:72px; height:72px; flex-shrink:0; border-radius:50%; object-fit:cover; display:flex; align-items:center; justify-content:center; font-size:26px; font-weight:bold; background:linear-gradient(135deg,#60a5fa,#7c3aed); }
+.whoami h1 { margin:0 0 3px; font-size:22px; }
+.whoami h2 { margin:18px 0 6px; font-size:13px; color:#bfdbfe; }
+.whoami p { margin:0; color:#94a3b8; }
+.whoami .whoami-about { color:#e5edf8; }
+.whoami dl { display:grid; grid-template-columns:110px 1fr; gap:6px 12px; margin:0; }
+.whoami dt { color:#94a3b8; }
+.whoami dd { margin:0; overflow-wrap:anywhere; }
+.whoami a { color:#93c5fd; }

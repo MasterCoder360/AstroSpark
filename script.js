@@ -17,10 +17,42 @@ window.addEventListener("load", () => {
   }, 300);
 });
 
+// ---------- Settings ----------
+const SETTINGS_KEY = "astrospark.settings";
+const DEFAULTS = { tint: "blue", wallpaper: "animated", opacity: 78, dock: "medium", clock24: false, seconds: true, reduceMotion: false };
+const WALLPAPERS = { animated: "./Blackhole.gif", glow: "./BlackHole2.gif", starburst: "./Starburst.gif", still: "./BlackHole.jpeg", plain: "" };
+const DOCK_SIZES = { small: 36, medium: 43, large: 52 };
+const settings = { ...DEFAULTS };
+try {
+  Object.assign(settings, JSON.parse(localStorage.getItem(SETTINGS_KEY) || "{}"));
+  // carry over values saved by the old settings panel
+  const oldTint = localStorage.getItem("astrospark.tint");
+  if (oldTint && !localStorage.getItem(SETTINGS_KEY)) settings.tint = oldTint;
+} catch (_) {}
+
+function saveSettings() {
+  try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); } catch (_) {}
+}
+
+function applySettings() {
+  const root = document.documentElement, wp = WALLPAPERS[settings.wallpaper] ?? WALLPAPERS.animated;
+  root.dataset.tint = settings.tint;
+  root.style.setProperty("--window-alpha", settings.opacity / 100);
+  root.style.setProperty("--dock-size", (DOCK_SIZES[settings.dock] || 43) + "px");
+  root.classList.toggle("reduce-motion", settings.reduceMotion);
+  document.body.style.backgroundImage = wp ? `url('${wp}')` : "none";
+  document.body.style.backgroundColor = wp ? "" : "#0b0d19";
+  tick();
+}
+
 // ---------- Clock ----------
 const clockEl = document.getElementById("timeElement");
-const tick = () => { clockEl.textContent = new Date().toLocaleString(); };
-setInterval(tick, 1000); tick();
+function tick() {
+  const opts = { hour: "numeric", minute: "2-digit", hour12: !settings.clock24 };
+  if (settings.seconds) opts.second = "2-digit";
+  clockEl.textContent = new Date().toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" }) + "  " + new Date().toLocaleTimeString(undefined, opts);
+}
+setInterval(tick, 1000);
 
 // ---------- App icons: generated SVG (gradient tile + white glyph) ----------
 const ICONS = {
@@ -32,8 +64,8 @@ const ICONS = {
   notes:    ["#fbbf24", "#d97706", '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3.5"/>'],
   calc:     ["#a78bfa", "#6d28d9", '<rect x="5" y="3" width="14" height="18" rx="2"/><rect x="8" y="6" width="8" height="3"/><g fill="#fff" stroke="none"><circle cx="9" cy="13" r="1"/><circle cx="12" cy="13" r="1"/><circle cx="15" cy="13" r="1"/><circle cx="9" cy="17" r="1"/><circle cx="12" cy="17" r="1"/><circle cx="15" cy="17" r="1"/></g>'],
   calendar: ["#fb7185", "#be123c", '<rect x="4" y="5" width="16" height="16" rx="2"/><path d="M8 3v4M16 3v4M4 10h16M8 14h2M14 14h2M8 17h2"/>'],
-  files: ["#38bdf8", "#0369a1", '<path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>'],  
-   settings: ["#94a3b8", "#334155", '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3M4.93 4.93l2.12 2.12m9.9 9.9 2.12 2.12m0-14.14-2.12 2.12m-9.9 9.9-2.12 2.12"/>'],
+  files: ["#38bdf8", "#0369a1", '<path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>'],
+  settings: ["#94a3b8", "#334155", '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3M4.93 4.93l2.12 2.12m9.9 9.9 2.12 2.12m0-14.14-2.12 2.12m-9.9 9.9-2.12 2.12"/>'],
   terminal: ["#475569", "#0f172a", '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 10l3 2-3 2M12 15h5"/>'],
 };
 let gradN = 0;
@@ -43,7 +75,7 @@ function iconSVG(id) {
 }
 
 // ---------- App definitions ----------
-// Each app: title, icon, desc, size, and build(container) -> optional { onShow, onHide }
+// build(container) may return { onShow, onHide }
 const APPS = {
   launcher: {
     title: "App Launcher", icon: "🚀", w: 520, h: 420, hidden: true,
@@ -64,8 +96,43 @@ const APPS = {
     title: "AstroSpark", icon: "✨", desc: "Introduction to AstroSparkOS", w: 440, h: 400,
     build(c) {
       c.innerHTML = `<div class="pad"><h1>Welcome to AstroSpark WebOS!</h1><h2>Introduction</h2>
-        <p>AstroSpark is a small browser-based desktop with a collection of useful tools and space-themed apps. Use the dock to launch an app, drag a window by its title bar, or open the launcher to see everything available.</p>
+        <p>AstroSpark is a small browser-based desktop with a collection of useful tools and space-themed apps. Click the AstroSparkOS on the top-right of the top menu bar for a Who Am I page. Use the dock to launch an app, drag a window by its title bar, or open the launcher to see everything available.</p>
         <img src="./BlackHole.jpeg" alt="Black Hole"></div>`;
+    },
+  },
+
+  whoami: {
+    title: "Who Am I", icon: "👤", w: 460, h: 520, hidden: true, noDock: true,
+    build(c) {
+      const me = {
+        name: "Raahil Aalam",
+        tagline: "A coder, a student, and a web developer",
+        photo: "./code.jpeg",
+        about: "I am a student and a web developer who loves coding and exploring new technologies. I usually code in my free time.",
+        details: [
+          ["Location", "Jersey City, USA"],
+          ["School", "Infinity Institue"],
+          ["Interests", "Coding, Web Development, and Technology"],
+          ["Favorite project", "AstroSparkOS (this project!)"],
+        ],
+        links: [
+          ["GitHub", "https://github.com/MasterCoder360"],
+          ["Email", "raahilaalam0804@gmail.com"],
+        ],
+      };
+      const esc = t => String(t).replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
+      const initials = me.name.replace(/[\[\]]/g, "").split(/\s+/).map(w => w[0]).join("").slice(0, 2).toUpperCase() || "?";
+      c.innerHTML = `<div class="whoami">
+        <div class="whoami-head">
+          ${me.photo ? `<img class="whoami-photo" src="${esc(me.photo)}" alt="${esc(me.name)}">` : `<div class="whoami-photo">${esc(initials)}</div>`}
+          <div><h1>${esc(me.name)}</h1><p>${esc(me.tagline)}</p></div>
+        </div>
+        <h2>About me</h2><p class="whoami-about">${esc(me.about)}</p>
+        <h2>Details</h2>
+        <dl>${me.details.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("")}</dl>
+        <h2>Links</h2>
+        <dl>${me.links.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${/^\[?https?:\/\//.test(v) ? `<a href="${esc(v.replace(/[\[\]]/g, ""))}" target="_blank" rel="noopener">${esc(v)}</a>` : esc(v)}</dd>`).join("")}</dl>
+      </div>`;
     },
   },
 
@@ -94,16 +161,8 @@ const APPS = {
       function initMap() {
         if (map || !window.L) return;
         map = L.map(mapEl, { worldCopyJump: true, zoomControl: true, minZoom: 2 }).setView([15, 0], 2);
-
-
-L.tileLayer(
-  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
-  {
-    maxZoom: 19,
-    attribution: "Tiles &copy; Esri"
-  }
-).addTo(map);
-
+        L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+          { maxZoom: 19, attribution: "Tiles &copy; Esri" }).addTo(map);
 
         const issIcon = L.divIcon({ className: "iss-map-icon", html: '<span>🛰</span>', iconSize: [34,34], iconAnchor: [17,17] });
         marker = L.marker([0,0], { icon: issIcon, title: "International Space Station" }).addTo(map)
@@ -241,6 +300,7 @@ L.tileLayer(
       render();
     }
   },
+
   files: {
     title: "File Cabinet", icon: "📁", desc: "Browse local AstroSpark workspace shortcuts", w: 500, h: 430,
     build(c) {
@@ -257,17 +317,47 @@ L.tileLayer(
     }
   },
   settings: {
-    title: "System Settings", icon: "⚙️", desc: "Personalize the desktop", w: 440, h: 430,
+    title: "System Settings", icon: "⚙️", desc: "Personalize the desktop", w: 460, h: 540,
     build(c) {
-      c.innerHTML = `<div class="settings-app"><h2>Appearance</h2><p>Choose the desktop glass tint.</p><div class="setting-options"><button data-tint="blue">Ocean</button><button data-tint="violet">Nebula</button><button data-tint="neutral">Graphite</button></div><h2>Desktop</h2><label><input type="checkbox" class="motion-toggle"> Reduce interface motion</label><h2>System</h2><p>AstroSparkOS · Browser edition</p><button class="settings-reset">Reset appearance</button></div>`;
-      const root=document.documentElement;
-      const apply=t=>{root.dataset.tint=t;try{localStorage.setItem("astrospark.tint",t);}catch(_){}};
-      try{apply(localStorage.getItem("astrospark.tint")||"blue");}catch(_){}
-      c.querySelectorAll("[data-tint]").forEach(b=>b.onclick=()=>apply(b.dataset.tint));
-      const motion=c.querySelector(".motion-toggle");try{motion.checked=localStorage.getItem("astrospark.reduceMotion")==="1";}catch(_){}
-      motion.onchange=()=>{root.classList.toggle("reduce-motion",motion.checked);try{localStorage.setItem("astrospark.reduceMotion",motion.checked?"1":"0");}catch(_){}};
-      try{root.classList.toggle("reduce-motion",localStorage.getItem("astrospark.reduceMotion")==="1");}catch(_){}
-      c.querySelector(".settings-reset").onclick=()=>{apply("blue");motion.checked=false;root.classList.remove("reduce-motion");};
+      const choice = (key, opts) => `<div class="setting-options" data-key="${key}">` +
+        opts.map(([v, label]) => `<button data-val="${v}">${label}</button>`).join("") + "</div>";
+      const toggle = (key, label) => `<label><input type="checkbox" data-toggle="${key}"> ${label}</label>`;
+      c.innerHTML = `<div class="settings-app">
+        <h2>Appearance</h2><p>Window tint</p>
+        ${choice("tint", [["blue", "Ocean"], ["violet", "Nebula"], ["neutral", "Graphite"]])}
+        <p>Wallpaper</p>
+        ${choice("wallpaper", [["animated", "Black hole"], ["glow", "Black hole 2"], ["starburst", "Starburst"], ["still", "Black hole (still)"], ["plain", "Plain"]])}
+        <p>Window opacity <span class="opacity-value"></span></p>
+        <input type="range" class="opacity-range" min="40" max="100" step="2">
+        <h2>Dock</h2><p>Icon size</p>
+        ${choice("dock", [["small", "Small"], ["medium", "Medium"], ["large", "Large"]])}
+        <h2>Clock</h2>
+        ${toggle("clock24", "Use 24-hour time")}
+        ${toggle("seconds", "Show seconds")}
+        <h2>Accessibility</h2>
+        ${toggle("reduceMotion", "Reduce interface motion")}
+        <h2>System</h2><p>AstroSparkOS · Browser edition</p>
+        <button class="settings-reset">Reset to defaults</button></div>`;
+
+      const range = c.querySelector(".opacity-range"), rangeLabel = c.querySelector(".opacity-value");
+      function sync() {
+        c.querySelectorAll(".setting-options").forEach(group => {
+          group.querySelectorAll("button").forEach(b => b.classList.toggle("active", b.dataset.val === String(settings[group.dataset.key])));
+        });
+        c.querySelectorAll("[data-toggle]").forEach(box => { box.checked = !!settings[box.dataset.toggle]; });
+        range.value = settings.opacity;
+        rangeLabel.textContent = settings.opacity + "%";
+      }
+      function update(patch) { Object.assign(settings, patch); saveSettings(); applySettings(); sync(); }
+
+      c.addEventListener("click", e => {
+        const b = e.target.closest(".setting-options button");
+        if (b) update({ [b.parentNode.dataset.key]: b.dataset.val });
+      });
+      c.querySelectorAll("[data-toggle]").forEach(box => box.addEventListener("change", () => update({ [box.dataset.toggle]: box.checked })));
+      range.addEventListener("input", () => update({ opacity: Number(range.value) }));
+      c.querySelector(".settings-reset").addEventListener("click", () => update({ ...DEFAULTS }));
+      sync();
     }
   },
   terminal: {
@@ -379,7 +469,7 @@ function closeWin(id) {
   renderDock();
 }
 
-// Dock: closed -> open; open but behind -> raise; focused -> close
+// Dock click: closed opens, open-but-behind raises, focused closes
 function dockClick(id) {
   const w = wins[id];
   if (!w || !w.open) openWin(id);
@@ -388,14 +478,17 @@ function dockClick(id) {
 }
 
 const dock = document.getElementById("dock");
-Object.entries(APPS).forEach(([id, a]) => {
+Object.entries(APPS).filter(([, a]) => !a.noDock).forEach(([id, a]) => {
   const d = document.createElement("div");
   d.className = "dock-icon"; d.id = "dock-" + id; d.title = a.title; d.innerHTML = iconSVG(id);
   d.onclick = () => dockClick(id);
   dock.appendChild(d);
 });
 function renderDock() {
-  Object.keys(APPS).forEach(id => document.getElementById("dock-" + id).classList.toggle("active-app", !!(wins[id] && wins[id].open)));
+  Object.keys(APPS).forEach(id => {
+    const el = document.getElementById("dock-" + id);
+    if (el) el.classList.toggle("active-app", !!(wins[id] && wins[id].open));
+  });
 }
 
 // ---------- Dragging (one set of global listeners) ----------
@@ -416,5 +509,6 @@ document.addEventListener("mousemove", e => {
 });
 document.addEventListener("mouseup", () => { drag = null; document.body.classList.remove("dragging"); });
 
-document.getElementById("osTrigger").addEventListener("click", () => openWin("welcome"));
+document.getElementById("osTrigger").addEventListener("click", () => openWin("whoami"));
+applySettings();
 openWin("welcome");
