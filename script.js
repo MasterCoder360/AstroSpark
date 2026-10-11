@@ -373,7 +373,7 @@ const APPS = {
         echo: a => a.join(" "),
         apps: () => Object.keys(APPS).filter(k => !APPS[k].hidden).join("  "),
         open: a => (APPS[a[0]] ? (openWin(a[0]), "Opening " + a[0] + "...") : "Unknown app. Try: apps"),
-        neofetch: () => "  ✨  AstroSparkOS\n  OS: WebOS 2.0\n  Shell: AstroShell\n  Host: " + navigator.userAgent.split(" ").slice(-1)[0] + "\n  Screen: " + innerWidth + "x" + innerHeight,
+        neofetch: () => "  ✨  AstroSparkOS\n  OS: WebOS 1.0\n  Shell: AstroShell\n  Host: " + navigator.userAgent.split(" ").slice(-1)[0] + "\n  Screen: " + innerWidth + "x" + innerHeight,
         clear: () => { out.textContent = ""; return null; },
         iss: async () => {
           const r = await (await fetch("https://api.wheretheiss.at/v1/satellites/25544")).json();
