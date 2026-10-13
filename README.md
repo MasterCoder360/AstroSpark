@@ -13,11 +13,11 @@
 
 ## What even is this?
 
-A web-based desktop os I built for [Hack Club Stardance](https://hackclub.com) and [Hack Club Beest](https://hackclub.com) WebOS Jam. It runs in your browser and has a space theme cause why not.
+A web-based desktop os I built for [Hack Club Stardance](https://hackclub.com) and [Hack Club Beest](https://hackclub.com) WebOS Jam. It runs in your browser and has a space theme cause why not. 
 
-So I wanted to make a mock operating system that runs entirely in the browser. No backend, no build step, just HTML/CSS/JS. It's got 11 apps, a window manager, glassmorphism UI, and a boot sequence that's honestly way more dramatic than it needs to be.
+So I wanted to make a mock operating system that runs entirely in the browser. No backend, no build step, just HTML/CSS/JS. It's got 11 apps, a window manager, glassmorphism UI, and a boot sequence that was honestly way more dramatic than it needs to be.
 
-The only app that actually calls an API is the ISS tracker (using wheretheiss.at). Everything else saves to localStorage. Pretty self-contained.
+The only app that actually calls an API is the ISS tracker (using wheretheiss.at). Everything else saves to localStorage. Pretty self-contained, right?.
 
 ## The apps
 

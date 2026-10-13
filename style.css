@@ -316,3 +316,14 @@ html.reduce-motion * {
   .dock-container { max-width:calc(100vw - 20px); gap:5px; padding:6px 8px; }
   .dock-icon { width:36px; height:36px; }
 }
+/* Easter egg rainbow effect */
+@keyframes rainbow {
+  0% { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}
+/* Shake animation for invalid actions */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}

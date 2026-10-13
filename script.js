@@ -721,3 +721,81 @@ document.addEventListener("mouseup", () => {
 document.getElementById("osTrigger").addEventListener("click", () => openWin("whoami"));
 applySettings();
 openWin("welcome");
+// ---------- Easter Egg: Konami Code ----------
+// Because every good OS needs secrets
+const konami = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+let konamiIndex = 0;
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === konami[konamiIndex]) {
+    konamiIndex++;
+    if (konamiIndex === konami.length) {
+      // Rainbow explosion!
+      document.body.style.animation = 'rainbow 2s infinite';
+      setTimeout(() => {
+        document.body.style.animation = '';
+        alert(' You found the secret! You are a true explorer. - Raahil');
+      }, 2000);
+      konamiIndex = 0;
+    }
+  } else {
+    konamiIndex = 0;
+  }
+});
+// Shake animation for invalid actions
+function shakeWindow(id) {
+  const w = wins[id];
+  if (!w) return;
+  w.el.style.animation = 'shake 0.3s';
+  setTimeout(() => w.el.style.animation = '', 300);
+}
+
+// Add shake when trying to drag off-screen
+document.addEventListener("mousemove", e => {
+  if (!drag) return;
+  const newX = Math.min(innerWidth - 60, e.clientX - drag.dx);
+  const newY = Math.min(innerHeight - 40, Math.max(32, e.clientY - drag.dy));
+  
+  // If hitting the edge, shake the window
+  if (newX <= 0 || newX >= innerWidth - 60 || newY <= 32 || newY >= innerHeight - 40) {
+    shakeWindow(drag.el.dataset.windowId);
+  }
+  
+  drag.el.style.left = newX + "px";
+  drag.el.style.top = newY + "px";
+});
+const funnyResponses = [
+  "Hmm, I don't know that command. Maybe try 'help'?",
+  "That's not a thing. But I respect your creativity.",
+  "Error 404: Command not found. Have you tried turning it off and on again?",
+  "I'm just a simple terminal. I don't understand complex commands like that.",
+  "Nice try, but that's not how this works.",
+  "I wish I could do that. Maybe in the next version?",
+];
+
+input.addEventListener("keydown", async e => {
+  if (e.key !== "Enter") return;
+  const line = input.value.trim(); input.value = ""; print("$ " + line);
+  if (!line) return;
+  
+  const [cmd, ...args] = line.split(/\s+/);
+  
+  // Easter egg: if they type "raahil", show a special message
+  if (cmd === "raahil") {
+    print("👋 Hey! You found my name. I'm the developer of AstroSparkOS. Thanks for checking it out!");
+    return;
+  }
+  
+  if (!cmds[cmd]) {
+    // Random funny response instead of generic error
+    const response = funnyResponses[Math.floor(Math.random() * funnyResponses.length)];
+    return print(response);
+  }
+  
+  try { 
+    const r = await cmds[cmd](args); 
+    if (r) print(r); 
+  } catch (err) { 
+    print("Error: " + err.message); 
+  }
+});
