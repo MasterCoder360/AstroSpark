@@ -1,5 +1,3 @@
-// REMEMBER: Add <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script> to your index.html <head>
-
 // ==========================================
 // AstroSparkOS - main logic
 // Raahil - Hack Club WebOS Jam
